@@ -6,8 +6,10 @@ const mongoose = require('mongoose');
 
 const Tour = require("../../models/tourModel");
 
+console.log(process.env.DATABASE);
 
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
+
 
 mongoose
   .connect(DB, {
@@ -20,7 +22,7 @@ mongoose
  
 //read json file
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8'));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
   //console.log(tours);
 
