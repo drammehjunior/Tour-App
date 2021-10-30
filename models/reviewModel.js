@@ -17,15 +17,14 @@ const reviewSchema = mongoose.Schema({
         min: [1, "Ratings must be above 1"],
         max: [5, "Ratings must below 5"]
     },
-    refTOTour: {
-        type: mongoose.Schema.ObjectID,
+    refToTour: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Tour',
         required: [true, 'Review must belong to a tour.']
     },
     refToUser: {
-        type: mongoose.Schema.ObjectID,
-        ref: 'User',
-        required: [true, "Review must belong to a user."]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'    
     }
 
 }, {
