@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const mongoose = require('mongoose');
 const validator = require('validator');
 const Tour = require('./tourModel');
@@ -32,7 +33,26 @@ const reviewSchema = mongoose.Schema({
     toObject: { virtuals: true }
   });
 
+// reviewSchema.pre(/^find/, function(next){
+//     this.populate({
+//         path: 'refToTour',
+//         select: 'name'
+//     }).populate({
+//         path: 'refToUser',
+//         select: 'name _id email'
+//     });
 
+//     next();
+// });
+
+reviewSchema.pre(/^find/, function(next){
+    this.populate({
+        path: 'refToUser',
+        select: 'name _id email'
+    });
+
+    next();
+});
 
 
 const Review = mongoose.model('Review', reviewSchema);

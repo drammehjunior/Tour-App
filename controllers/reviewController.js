@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const Review = require("../models/reviewModel");
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
@@ -9,8 +10,9 @@ exports.getAllReviews = catchAsync( async (req, res, next) => {
         return next(new AppError("There has been a error, Please wait a moment", 500));
     };
 
-    res.status(201).json({
-        status: 201,
+    res.status(200).json({
+        status: 200,
+        reviewCount: reviews.length,
         data: {
             reviews
         }

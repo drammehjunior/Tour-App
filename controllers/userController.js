@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+// eslint-disable-next-line import/no-useless-path-segments
 const APIFeatures = require("./../utils/apiFeatures");
 
 
