@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 // eslint-disable-next-line import/no-useless-path-segments
 const APIFeatures = require("./../utils/apiFeatures");
+const factory = require("./handlerFactory");
 
 
 const filterObj = (obj, ...allowedFields) => {
@@ -71,16 +72,5 @@ exports.updateMe = catchAsync( async (req, res, next) => {
     });
   };
   
-  exports.updateUser = (req, res) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'This route is not yet ready',
-    });
-  };
-  
-  exports.deleteUser = (req, res) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'This route is not yet ready',
-    });
-  };
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.factoryDelete(User);

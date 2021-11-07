@@ -7,7 +7,15 @@ const router = express.Router({mergeParams: true});
 router
     .route('/')
     .get(authController.protect, reviewController.getAllReviews)
-    .post(authController.protect, authController.restrictTo('user'), reviewController.createReview)
+    .post(  authController.protect, 
+            authController.restrictTo('user'), 
+            reviewController.setTourUserIds,
+            reviewController.createReview)
 
+
+router
+    .route('/:id')
+    .delete(reviewController.deleteReview)
+    .patch(reviewController.updateReview)
 
 module.exports = router;
