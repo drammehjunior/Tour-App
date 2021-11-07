@@ -21,7 +21,10 @@ exports.getAllReviews = catchAsync( async (req, res, next) => {
 });
 
 exports.createReview = catchAsync( async (req, res, next) => {
-    req.body.refToUser = req.user.id;
+
+    if(!req.body.refToUser) req.body.refToUser = req.user.id;
+    if(!req.body.refToTour) req.body.refToTour = req.params.tourId;
+    
     const newReview = await Review.create(req.body);
     if(!newReview){
         next(new AppError("Saving data failed, please try again later", 500));
