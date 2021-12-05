@@ -5,25 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require("./handlerFactory");
 
-exports.getAllReviews = catchAsync( async (req, res, next) => {
 
-    let filter = {};
-
-    if(req.params.tourId) filter = {refToTour: req.params.tourId};
-    const reviews = await Review.find(filter);
-    if(!reviews){
-        return next(new AppError("There has been a error, Please wait a moment", 500));
-    };
-
-    res.status(200).json({
-        status: 200,
-        reviewCount: reviews.length,
-        data: {
-            reviews
-        }
-    });
-
-});
 
 exports.setTourUserIds = catchAsync( async (req, res, next) => {
     if(!req.body.refToUser) req.body.refToUser = req.user.id;
@@ -31,6 +13,7 @@ exports.setTourUserIds = catchAsync( async (req, res, next) => {
     next();
 });
 
+exports.getAllReviews = factory.getAll(Review);
 exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.factoryDelete(Review);
