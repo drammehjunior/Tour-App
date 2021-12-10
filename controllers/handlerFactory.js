@@ -72,7 +72,7 @@ exports.getAll = model =>
   catchAsync(async (req, res) => {
 
     let filter = {};
-    if(req.params.tourId) filter = {refToTour: req.params.tourId};
+    if(req.params.tourId) filter = {tour: req.params.tourId};
     
     const features = new APIFeatures(model.find(filter), req.query).filter().sort().limitFields().paginate();
     const doc = await features.query;

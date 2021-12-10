@@ -13,6 +13,7 @@ exports.setTourUserIds = catchAsync( async (req, res, next) => {
     next();
 });
 
+exports.getReview = factory.getOne(Review);
 exports.getAllReviews = factory.getAll(Review);
 exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
