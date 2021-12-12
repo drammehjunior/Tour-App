@@ -113,6 +113,10 @@ const tourSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
+tourSchema.index({price: 1, ratingsAverage: -1});
+tourSchema.index({slug: 1});
+
+
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
@@ -138,10 +142,10 @@ tourSchema.virtual('reviews', {
 
 
 //document middleware is also the same as express middleware, in .pre we have access to next parameter to be called
-// tourSchema.pre('save', function(next){
-//   this.slug = slugify(this.name, {lower: true});
-//   next();
-// });
+tourSchema.pre('save', function(next){
+  this.slug = slugify(this.name, {lower: true});
+  next();
+});
 
 
 // //.post have the access to doc (document that is saved) and next

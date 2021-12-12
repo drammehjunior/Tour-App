@@ -8,8 +8,8 @@ const factory = require("./handlerFactory");
 
 
 exports.setTourUserIds = catchAsync( async (req, res, next) => {
-    if(!req.body.refToUser) req.body.refToUser = req.user.id;
-    if(!req.body.refToTour) req.body.refToTour = req.params.tourId;
+    if(!req.body.refToUser) req.body.user = req.user.id;
+    if(!req.body.refToTour) req.body.tour = req.params.tourId;
     next();
 });
 
