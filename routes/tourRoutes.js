@@ -15,6 +15,8 @@ router.route('/just-check').get(tourController.checkController);
 
 router.route('/monthly-plan/:year').get(authController.protect, authController.restrictTo('admin', 'lead-guide', 'guide'), tourController.getMonthlyPlan);
 
+router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(tourController.getToursWithin);
+
 
 //This is the nested route
 router.use('/:tourId/reviews', reviewRoutes);
