@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -16,8 +17,12 @@ const reviewRouter = require('./routes/reviewRoutes');
 
 const  app = express();
 
-//set Security HTTP headers
-app.use(helmet());
+//setting the view Engine
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+//serves static files to the clienet 
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 // 1) GLOBAL FIRST MIDDLEWARE
@@ -27,8 +32,9 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(express.json());
 
-app.use(express.static(`${__dirname}/public`));
 
+//set Security HTTP headers
+app.use(helmet());
 
 //Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -72,6 +78,12 @@ app.use('/api', limiter);
 
 
 //this is the route to the requests
+app.use('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: "The Park Camper",
+    user: "Mauamadou Drammeh"
+  });
+});
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
