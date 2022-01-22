@@ -50,7 +50,7 @@ reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 reviewSchema.pre(/^find/, function(next){
     this.populate({
         path: 'user',
-        select: 'name _id email'
+        select: 'name _id email photo'
     });
 
     next();
@@ -91,7 +91,7 @@ reviewSchema.post('save', function(){
 
 reviewSchema.pre(/^findOneAnd/, async function(){ 
   this.doc = await this.findOne();
-  console.log(this.doc);
+  //console.log(this.doc);
 });
 
 reviewSchema.post(/^findOneAnd/, async function(){
