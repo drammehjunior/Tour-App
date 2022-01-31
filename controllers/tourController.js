@@ -1,5 +1,6 @@
 /* eslint-disable prefer-object-spread */
 const Tour = require('../models/tourModel');
+// eslint-disable-next-line no-unused-vars
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -35,6 +36,7 @@ exports.getToursWithin = catchAsync( async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
   //if(unit == 'miles' || unit == 'kilometers')
+  //the distance is converted from mile or kilometers into earth radius unit
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
 
   if(!lat || !lng){
@@ -58,6 +60,7 @@ exports.getDistances = catchAsync( async (req, res, next) => {
   const {latlng, unit} = req.params;
   const [lat, lng] = latlng.split(',');
 
+  // the multiplier is measured in Meters Hence, both miles and kilometers are then converted to meters unit
   const multiplier = unit === "mi" ? 0.000621371 : 0.001
 
   if(!lat || !lng){

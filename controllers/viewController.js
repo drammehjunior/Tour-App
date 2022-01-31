@@ -28,8 +28,23 @@ exports.getTour = catchasync ( async (req, res) => {
   // 3) Render template from 1)
   //console.log(tour)
 
- res.status(200).render('tour', {
-    title: `${tour.name} Tour`,
-    tour
-  });
-});
+ res.status(200)
+              .set(
+                'Content-Security-Policy',
+                'connect-src https://*.tiles.mapbox.com https://api.mapbox.com https://events.mapbox.com'
+              )
+              .render('tour', {
+                  title: `${tour.name} Tour`,
+                  tour
+                });
+              });
+
+exports.login = catchasync ( async (req, res) =>{
+    res.status(200)
+    .set(
+      'Content-Security-Policy',
+      "connect-src 'self' https://cdnjs.cloudflare.com")
+      .render('login', {
+        title: "Log into your account"
+      })
+})

@@ -72,7 +72,7 @@ exports.login = catchAsync( async(req, res, next) => {
     }
 
     //3) if everything ok, send token to the client
-    createSendToken(user, 201, res);
+    createSendToken(user, 200, res);
 
 });
 
@@ -82,7 +82,9 @@ exports.protect = catchAsync( async (req, res, next) => {
   if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
     token = req.headers.authorization.split(' ')[1];
 
-  }
+  }else if(req.cookies.jwt){
+    token = req.cookies.jwt
+  };
   //console.log(token);
   if(!token){
     return next(new AppError('Unauthorized, You are not logged in', 401))
