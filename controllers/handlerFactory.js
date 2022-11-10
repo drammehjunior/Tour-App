@@ -50,7 +50,7 @@ exports.createOne = model => catchAsync(async (req, res, next) => {
 });
 
 exports.getOne = (model, populateOptions) => catchAsync(async (req, res, next) => {
-  let query = model.findById(req.params.id);
+  const query = model.findById(req.params.id);
   if(populateOptions){
     query.populate(populateOptions);
   }

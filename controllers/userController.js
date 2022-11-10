@@ -2,7 +2,6 @@ const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 // eslint-disable-next-line import/no-useless-path-segments
-const APIFeatures = require("./../utils/apiFeatures");
 const factory = require("./handlerFactory");
 
 
@@ -17,6 +16,10 @@ const filterObj = (obj, ...allowedFields) => {
 
 
 exports.updateMe = catchAsync( async (req, res, next) => {
+
+  if(Object.keys(req.body).length === 0){
+    next(new AppError("Update body cannot be empty", 400))
+  }
   // 1) Create error if user POSTs password data
   if(req.body.password || req.body.confirmPassword){
     next(new AppError('This route is not for password updates. Please use /updateMyPassword', 400));
