@@ -1,7 +1,7 @@
 process.on('uncaughtException', (err) => {
-  console.log("UNCAUGHT EXEPTION💥 System shutting down...");
+  console.log('UNCAUGHT EXEPTION💥 System shutting down...');
   console.log(err.stack);
-  console.log()
+  console.log();
   process.exit(1);
 });
 
@@ -21,8 +21,8 @@ mongoose
     useFindAndModify: false,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("connection to database successful"));
- 
+  .then(() => console.log('connection to database successful'));
+
 const port = process.env.PORT;
 
 const server = app.listen(port, () => {
@@ -30,12 +30,9 @@ const server = app.listen(port, () => {
 });
 
 process.on('unhandledRejection', (err) => {
-  console.log( err.name, err.message);
-  console.log("UNHANDLED REJECTION! 💥 System shutting down...");
+  console.log(err.name, err.message);
+  console.log('UNHANDLED REJECTION! 💥 System shutting down...');
   server.close(() => {
     process.exit(1);
   });
 });
-
-
-

@@ -4,34 +4,36 @@ const validator = require('validator');
 const Tour = require('./tourModel');
 const User = require('./userModel');
 
-const reviewSchema = mongoose.Schema({
+const reviewSchema = mongoose.Schema(
+  {
     review: {
-        type: String,
-        required: [true, "the review cannot be empty"]
+      type: String,
+      required: [true, 'the review cannot be empty'],
     },
     createdAt: {
-        type: Date,
-        default: Date.now()
+      type: Date,
+      default: Date.now(),
     },
     rating: {
-        type: Number,
-        min: [1, "Ratings must be above 1"],
-        max: [5, "Ratings must below 5"]
+      type: Number,
+      min: [1, 'Ratings must be above 1'],
+      max: [5, 'Ratings must below 5'],
     },
     tour: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Tour',
-        required: [true, 'Review must belong to a tour.']
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tour',
+      required: [true, 'Review must belong to a tour.'],
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'    
-    }
-
-}, {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  },
+  {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-  });
+    toObject: { virtuals: true },
+  }
+);
 
 // reviewSchema.pre(/^find/, function(next){
 //     this.populate({
@@ -47,54 +49,53 @@ const reviewSchema = mongoose.Schema({
 
 reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
-reviewSchema.pre(/^find/, function(next){
-    this.populate({
-        path: 'user',
-        select: 'name _id email photo'
-    });
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: 'name _id email photo',
+  });
 
-    next();
+  next();
 });
 
-reviewSchema.statics.calAverageRating = async function(tourId){
-    const stats = await this.aggregate([
-        {
-            $match: {tour: tourId}
-        },
-        {
-            $group: { 
-                _id: '$tour',
-                nRating: { $sum: 1 },
-                avgRating: { $avg: '$rating'}
-            }
-        }
-    ]);
+reviewSchema.statics.calAverageRating = async function (tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
 
-    if(stats.length > 0){
-        await Tour.findByIdAndUpdate(tourId, {
-            ratingsQuantity: stats[0].nRating,
-            ratingsAverage: stats[0].avgRating
-        });
-    }else{
-        await Tour.findByIdAndUpdate(tourId, {
-            ratingsQuantity: 0,
-            ratingsAverage: 4.5
-        });
-    }
-    console.log(stats);
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
+  console.log(stats);
 };
 
-
-reviewSchema.post('save', function(){
-    this.constructor.calAverageRating(this.tour);
+reviewSchema.post('save', function () {
+  this.constructor.calAverageRating(this.tour);
 });
 
-reviewSchema.pre(/^findOneAnd/, async function(){ 
+reviewSchema.pre(/^findOneAnd/, async function () {
   this.doc = await this.findOne();
   //console.log(this.doc);
 });
 
-reviewSchema.post(/^findOneAnd/, async function(){
+reviewSchema.post(/^findOneAnd/, async function () {
   await this.doc.constructor.calAverageRating(this.doc.tour);
 });
 

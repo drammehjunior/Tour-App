@@ -4,7 +4,6 @@ const userController = require('./../controllers/userController');
 // eslint-disable-next-line import/no-useless-path-segments
 const authController = require('./../controllers/authController');
 
-
 const router = express.Router();
 
 router.post('/signup', authController.signup);
@@ -19,23 +18,13 @@ router.patch('/updateMyPassword', authController.updatePassword);
 router.patch('/updateMe', userController.updateMe);
 router.delete('/deleteMe', userController.deleteMe);
 
-router.get('/me', userController.getMe, userController.getUser)
-
-
- 
+router.get('/me', userController.getMe, userController.getUser);
 
 //only availabe for admin
 router.use(authController.restrictTo('admin'));
 
-router
-  .route('/')
-  .get(userController.getAllUsers)
-  .post(userController.createUser);
+router.route('/').get(userController.getAllUsers).post(userController.createUser);
 
-router
-  .route('/:id')
-  .get(userController.getUser)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+router.route('/:id').get(userController.getUser).patch(userController.updateUser).delete(userController.deleteUser);
 
 module.exports = router;
