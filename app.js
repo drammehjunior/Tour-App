@@ -13,6 +13,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
 
@@ -32,10 +33,28 @@ app.use(express.json());
 app.use(cookieParser());
 
 //set Security HTTP headers
-app.use(helmet());
+// app.use(
+//   helmet({
+//     crossOriginEmbedderPolicy: false,
+//     contentSecurityPolicy: {
+//       directives: {
+//         'child-src': ['blob:'],
+//         'connect-src': ['https://*.mapbox.com'],
+//         'default-src': ["'self'"],
+//         'font-src': ["'self'", 'https://fonts.gstatic.com'],
+//         'img-src': ["'self'", 'data:', 'blob:'],
+//         'script-src': ["'self'", 'https://*.mapbox.com'],
+//         'style-src': ["'self'", 'https:'],
+//         'worker-src': ['blob:'],
+//       },
+//     },
+//   })
+// );
+
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 
 //Data Sanitization against NoSQL query injection
-app.use(mongoSanitize());
+app.use(mongoSanitize())
 
 //Data sanitization against XSS
 app.use(xss());
@@ -47,7 +66,7 @@ app.use(
   })
 );
 
-app.use('/', (req, res, next) => {
+app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   console.log(req.cookies);
 
@@ -75,9 +94,7 @@ app.use('/api', limiter);
 
 //this is the route to the requests
 
-app.use('/', (req, res) => {
-  res.status(200).render('base');
-});
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);

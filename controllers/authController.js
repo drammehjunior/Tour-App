@@ -107,6 +107,32 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+// Onle for renderd pages
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  // 1) getting the token from the user and check if it exist
+  if (req.cookies.jwt) {
+    // 2) we need to validate the token
+    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+    //console.log(decoded);
+
+    // 3) check if the user still exists
+    const freshUser = await User.findById(decoded.id);
+    if (!freshUser) {
+      return next();
+    }
+
+    // 4) check if the user changed password after the JWT was issued
+    if (freshUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    // TTHERE IS A LOGGED IN USER
+    res.locals.user = freshUser;
+    return next();
+  }
+  next();
+});
+
 // eslint-disable-next-line arrow-body-style
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {

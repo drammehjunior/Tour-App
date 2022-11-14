@@ -1,9 +1,14 @@
 const Tour = require('../models/tourModel');
-const catchasync = require('../utils/catchAsync');
+const catchAsync = require('../utils/catchAsync');
 
-exports.getOverview = catchasync(async (req, res, next) => {
-  // 1) Get tour data from the collecrtion
+exports.getOverview = catchAsync(async (req, res, next) => {
+  // 1) Get tour data from collection
   const tours = await Tour.find();
+
+  // 2) Build Template
+
+  // 3) render template
+  console.log("I reached");
 
   res.status(200).render('overview', {
     title: 'All Tours',
@@ -11,32 +16,22 @@ exports.getOverview = catchasync(async (req, res, next) => {
   });
 });
 
-exports.getTour = catchasync(async (req, res) => {
-  // 1) get the data, for the requested tour (including reviews and tour guides)
-  const { slug } = req.params;
-  const tour = await Tour.findOne({ slug: slug }).populate({
+exports.getTour = catchAsync(async (req, res, next) => {
+  const tour = await Tour.findOne({ slug: req.params.slug }).populate({
     path: 'reviews',
-    select: 'review user rating',
+    fields: 'review rating user',
   });
-
-  //console.log(tour);
-
-  // 2) Build Template
-
-  // 3) Render template from 1)
-  //console.log(tour)
-
   res
     .status(200)
-    .set('Content-Security-Policy', 'connect-src https://*.tiles.mapbox.com https://api.mapbox.com https://events.mapbox.com')
+    .set('Content-Security-Policy', "frame-src 'self'")
     .render('tour', {
       title: `${tour.name} Tour`,
       tour,
     });
 });
 
-exports.login = catchasync(async (req, res) => {
-  res.status(200).set('Content-Security-Policy', "connect-src 'self' https://cdnjs.cloudflare.com").render('login', {
+exports.getLogin = catchAsync(async (req, res, next) => {
+  res.status(200).render('login', {
     title: 'Log into your account',
   });
 });
