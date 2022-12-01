@@ -51,9 +51,18 @@ exports.signup = catchAsync(async (req, res, next) => {
     confirmPassword: req.body.confirmPassword,
     passwordChangedAt: req.body.passwordChangedAt,
     role: req.body.role,
+    photo: req.body.photo,
   });
 
   createSendToken(newUser, 201, res);
+});
+
+exports.logout = catchAsync(async (req, res, next) => {
+  res.cookie('jwt', '', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -104,34 +113,40 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //GRANT ACCESS TO PROTECTED ROUTE
   req.user = freshUser;
+  res.locals.user = freshUser;
   next();
 });
 
 // Onle for renderd pages
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
   // 1) getting the token from the user and check if it exist
-  if (req.cookies.jwt) {
-    // 2) we need to validate the token
-    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
-    //console.log(decoded);
 
-    // 3) check if the user still exists
-    const freshUser = await User.findById(decoded.id);
-    if (!freshUser) {
+  try {
+    if (req.cookies.jwt) {
+      // 2) we need to validate the token
+      const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+      //console.log(decoded);
+
+      // 3) check if the user still exists
+      const freshUser = await User.findById(decoded.id);
+      if (!freshUser) {
+        return next();
+      }
+
+      // 4) check if the user changed password after the JWT was issued
+      if (freshUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // TTHERE IS A LOGGED IN USER
+      res.locals.user = freshUser;
       return next();
     }
-
-    // 4) check if the user changed password after the JWT was issued
-    if (freshUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    // TTHERE IS A LOGGED IN USER
-    res.locals.user = freshUser;
+    next();
+  } catch (e) {
     return next();
   }
-  next();
-});
+};
 
 // eslint-disable-next-line arrow-body-style
 exports.restrictTo = (...roles) => {
@@ -173,6 +188,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     user.passwordResetToken = undefined;
     user.PasswordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
+    console.log(err)
     return next(new AppError('there was an error sending that email, try again later!', 500));
   }
 });

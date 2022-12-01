@@ -14,6 +14,8 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log(req.file);
+  console.log(req.body);
   if (Object.keys(req.body).length === 0) {
     next(new AppError('Update body cannot be empty', 400));
   }

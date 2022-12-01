@@ -5,8 +5,8 @@ header.header
     img(src="/img/logo-white.png" alt='Natours logo')
   nav.nav.nav--user
     if user
-      a.nav__el(href='#') Log Out
-      a.nav__el(href='#')
+      a#logoutBtn.nav__el Log Out
+      a.nav__el(href='/me')
         img.nav__user-img(src=`/img/users/${user.photo}` alt='User Photo')
         span= user.name.split(' ')[0]
     else
