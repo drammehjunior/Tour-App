@@ -5,6 +5,7 @@
     "prettier/prettier": ["warn", { "singleQuote": true }],
     "spaced-comment": "off",
     "no-console": "off",
+    "ignoreChainWithDepth": 0,
     "consistent-return": "off",
     "func-names": "off",
     "object-shorthand": "off",

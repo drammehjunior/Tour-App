@@ -32,8 +32,19 @@ router
 router
   .route('/:id')
   .get(tourController.getTour)
-  .delete(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.deleteTour)
-  .patch(tourController.updateTour);
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.uploadTourImages,
+    tourController.resizeTourImages,
+    tourController.updateTour
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.deleteTour
+  )
+
 
 // router
 //     .route('/:tourId/reviews')

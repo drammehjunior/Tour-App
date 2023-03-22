@@ -1,8 +1,52 @@
+/* eslint-disable */
+
+const multer = require('multer');
+const sharp = require('sharp');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-// eslint-disable-next-line import/no-useless-path-segments
 const factory = require('./handlerFactory');
+
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split('/')[1];
+//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+//   },
+// });
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an Image! Please upload a valid image', 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadPhoto = upload.single('photo');
+
+exports.resizeUserPhoto = catchAsync( async (req, res, next) => {
+  if (!req.file) return next();
+
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`
+
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({quality: 90})
+    .toFile(`public/img/users/${req.file.filename}`);
+
+  next()
+});
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -14,9 +58,9 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log(req.file);
-  console.log(req.body);
-  if (Object.keys(req.body).length === 0) {
+  // console.log(req.file);
+  // console.log(req.body);
+  if (Object.keys(req.body).length === 0 && !req.file) {
     next(new AppError('Update body cannot be empty', 400));
   }
   // 1) Create error if user POSTs password data
@@ -26,7 +70,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   //2) filtered out unwanted fields names that are not allowed to be updated
   const filteredBody = filterObj(req.body, 'name', 'email');
-  console.log(filteredBody);
+  if (req.file) filteredBody.photo = req.file.filename;
+  //console.log(filteredBody);
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,
