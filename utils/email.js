@@ -2,8 +2,6 @@ const pug = require('pug');
 const nodemailer = require('nodemailer');
 const htmlToText = require('html-to-text');
 
-//new Email(user, url).sendWelcome();
-
 module.exports = class Email {
   constructor(user, url) {
     this.to = user.email;
@@ -12,10 +10,16 @@ module.exports = class Email {
     this.from = `Mamed Drammeh <${process.env.EMAIL_FROM}>`;
   }
 
-  createTransport() {
+  newTransport() {
     if (process.env.NODE_ENV === 'production') {
       //USE SENDGRID
-      return 1;
+      return nodemailer.createTransport({
+        service: 'SendGrid',
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD,
+        },
+      });
     }
 
     return nodemailer.createTransport({
@@ -28,42 +32,33 @@ module.exports = class Email {
     });
   }
 
-  send(template, subject) {
+  async send(template, subject) {
     // 1) Render the HTML based on a pub template
-    const html = pug.renderFile(`${__dirname}/../views/emails/${template}.pug`, {
+    const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       firstName: this.firstName,
       url: this.url,
-      subject:
+      subject,
     });
 
     //2) Define the email options
     const mailOptions = {
-      from: this.from,
+      //from: this.from,
+      from: process.env.SENDGRID_EMAIL_FROM,
       to: this.to,
       subject,
       html,
-      text: htmlToText.fromString(html),
+      text: htmlToText.htmlToText(html),
     };
 
     // 3) Create a transport and send email
+    await this.newTransport().sendMail(mailOptions);
   }
 
-  sendWelcome(){
-    this.send('welcome', 'Welcome to the Natours Family');
+  async sendWelcome(){
+    await this.send('welcome', 'Welcome to the Natours Family');
+  }
 
+  async sendPasswordReset(){
+    await this.send('passwordReset', 'Your password reset token (valid for 10 minutes)');
   }
 };
-
-// const sendEmail = async (options) => {
-//
-//   //2) define the email options
-//   const mailOptions = {
-//     from: 'Mamed Drammeh <admin@mamedsupport.com>',
-//     to: options.email,
-//     subject: options.subject,
-//     text: options.message,
-//   };
-//
-//   //3) send the email with nodemailer
-//   await transporter.sendMail(mailOptions);
-// };

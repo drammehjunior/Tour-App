@@ -3,7 +3,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const Tour = require('../models/tourModel');
 // eslint-disable-next-line no-unused-vars
-const APIFeatures = require('../utils/apiFeatures');
+//const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');

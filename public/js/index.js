@@ -3,7 +3,7 @@ import '@babel/polyfill';
 import {login, logout} from './login';
 import {displayMap} from './mapbox'
 import {updateSettings} from './updateSettings'
-
+import {bookTour} from './stripe';
 
 
 const mapBox = document.getElementById('map')
@@ -11,7 +11,9 @@ const loginForm = document.querySelector('.form--login')
 const logOutBtn = document.getElementById('logoutBtn')
 const updateDataBtn = document.querySelector('.form-user-data')
 const updatePasswordBtn = document.querySelector('.form-user-settings')
+const bookBtn = document.getElementById('book-tour')
 //VALUES
+
 
 if(mapBox){
   const locations = JSON.parse(document.getElementById('map').dataset.locations);
@@ -60,6 +62,15 @@ if(updatePasswordBtn){
 if(logOutBtn){
   logOutBtn.addEventListener('click', logout);
 }
+
+if (bookBtn){
+  bookBtn.addEventListener('click', ev => {
+    ev.target.textContent = 'Processing...'
+    const {tourId} = ev.target.dataset
+    bookTour(tourId)
+  })
+}
+
 
 
 
